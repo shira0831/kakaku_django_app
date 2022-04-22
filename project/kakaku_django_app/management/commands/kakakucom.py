@@ -1,67 +1,97 @@
 from django.core.management.base import BaseCommand
 
-from kakaku_django_app.management.commands.modules.chrome_driver import ChromeDriver
-from kakaku_django_app.management.commands.modules import get_pc_data
-from kakaku_django_app.models import UsedPC
+from ..modules.chrome_driver import ChromeDriver
+from ..modules import get_pc_data
 
+from sqlalchemy import create_engine
+import pandas as pd
+
+arr = []
 
 class Command(BaseCommand):
-    def handle(self, *args, **kwargs):
-        # driverを生成
-        chrome_driver = ChromeDriver()
+    def add_arguments(self, parser): #コマンド引数の定義
+        # int型の必須引数の定義
+        tp = lambda x:list(map(str, x.split(',')))
+        parser.add_argument('id', type=tp, nargs='*')
+        args = parser.parse_args()
 
-        genre_urls = [
-            'https://kakaku.com/used/pc/ca=0030/',
-            # 'https://kakaku.com/used/pc/ca=0080/',
-            # 'https://kakaku.com/used/pc/ca=0019/',
-            # 'https://kakaku.com/used/pc/ca=0010/',
-            # 'https://kakaku.com/used/pc/ca=0020/',
-            # 'https://kakaku.com/used/pc/ca=0030/',
+        print('test',args.id[1][0])
+
+        global arr
+        arr.append(args.id[1])
+
+    def handle(self, *args,**kwargs):
+        self.stdout.write(self.style.SUCCESS('id = "%s"' % kwargs['id']))
+        # driverを生成
+        print('argsargsargsargsargsargs',args)
+        print('kwargskwargskwargskwargs',kwargs)
+        
+        chrome_driver = ChromeDriver()
+        # genre_urls = [
+        #     'https://kakaku.com/used/pc/ca=0030/',
+        #     'https://kakaku.com/used/pc/ca=0080/',
+        #     'https://kakaku.com/used/pc/ca=0019/',
+        #     'https://kakaku.com/used/pc/ca=0010/',
+        #     'https://kakaku.com/used/pc/ca=0020/',
+        #     'https://kakaku.com/used/pc/ca=0030/',
+        # ]
+
+        # genre_urls = [
+        # 'https://kakaku.com/pc/note-pc/itemlist.aspx', # すべて ノートパソコン
+        # 'https://kakaku.com/pc/desktop-pc/itemlist.aspx',# すべて デスクトップパソコン
+        # 'https://kakaku.com/pc/mac-note-pc/itemlist.aspx',# すべて Mac ノート(MacBook)
+        # 'https://kakaku.com/pc/mac-desktop-pc/itemlist.aspx',# すべて Mac デスクトップ
+        # 'https://kakaku.com/pc/pda/itemlist.aspx'# すべて タブレットPC
+        # ]
+
+        test_urls = [
+        'https://kakaku.com/used/pc/ca=0030/',
+        'https://kakaku.com/used/pc/ca=0080/',
+        'https://kakaku.com/used/pc/ca=0019/',
+        'https://kakaku.com/used/pc/ca=0010/',
+        'https://kakaku.com/used/pc/ca=0020/',
+        'https://kakaku.com/used/pc/ca=0030/',
+        'https://kakaku.com/pc/note-pc/itemlist.aspx', # すべて ノートパソコン
+        'https://kakaku.com/pc/desktop-pc/itemlist.aspx',# すべて デスクトップパソコン
+        'https://kakaku.com/pc/mac-note-pc/itemlist.aspx',# すべて Mac ノート(MacBook)
+        'https://kakaku.com/pc/mac-desktop-pc/itemlist.aspx',# すべて Mac デスクトップ
+        'https://kakaku.com/pc/pda/itemlist.aspx'# すべて タブレットPC
         ]
+
+        
+
+        print('7777777',arr[0])
+        genre_urls = []
+        for i in arr[0]:
+            print('urls',i)
+            j =int(i)
+            genre_urls.append(test_urls[j-1])
+
+        print(genre_urls)
+        
 
         for genre_url in genre_urls:
 
+            data= []
+
             # ページ数を取得する
-            target_xpath = '//*[@id="main"]/div[1]/div/div/div/div/div/div/div/table/tbody/tr/td[1]/p/span[1]'
-            page_num = get_pc_data.get_page_number(
-                chrome_driver, genre_url, target_xpath)
-            print(f'{page_num}ページあります')
+            page_counts = get_pc_data.get_page_counts(chrome_driver, genre_url)
 
-            for i in range(1, page_num + 1):
-                # ページを表示する
-                chrome_driver.wait_displayed_page()
-                chrome_driver.open_url(f'{genre_url}Page={i}/')
+            # for i in range(1, page_counts + 1):
+            for i in range(1, 2):
+        
+                # ページを表示して各ページ内の商品urlを格納
+                links = get_pc_data.get_item_urls(chrome_driver,genre_url,i)
 
-                # ページ内の商品urlを格納
-                target_xpath = '.itemName > p > a'
-                links = get_pc_data.get_item_url(chrome_driver, target_xpath)
-
+                # 各商品url内の情報を取得
                 for link in links:
-                    # 格納した商品urlのページを一つずつ表示する
-                    chrome_driver.wait_displayed_page()
-                    chrome_driver.open_url(link)
-
-                    # 商品番号取得
-                    item_id = get_pc_data.get_pc_product(chrome_driver)
-
-                    # 商品url
-                    item_url = link
-
-                    # # 画像取得
-                    # target_xpath = '.usedprdPhoto > ul >li'
-                    # pc_img = get_pc_data.get_pc_img(chrome_driver, target_xpath)
-
-                    # # スペック取得
-                    # spec_dict = get_pc_data.get_pc_spec(chrome_driver)
-
-                    print(item_id, item_url)
-
-                    data = UsedPC(
-                        item_id=item_id,
-                        item_url=item_url
-                    )
-
-                    data.save()
+                    result = get_pc_data.get_data(chrome_driver,link)
+                    data.append(result)
 
         # driverを削除する
         chrome_driver.close_driver()
+
+        # DBへデータ登録
+        engine = create_engine('sqlite:///db.sqlite3', echo=True)
+        df = pd.DataFrame(data)
+        df.to_sql('kakaku_django_app_usedpc',con=engine, if_exists='append', index=False)
