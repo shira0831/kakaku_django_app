@@ -32,35 +32,35 @@
                         </div>
 
                         <div class="form-check ml-3">
-                            <input class="form-check-input" type="checkbox" value="https://kakaku.com/used/pc/ca=0020/" name="used_pc" id="flexCheckDefault">
+                            <input class="form-check-input" type="checkbox" value="https://kakaku.com/used/pc/ca=0020/" name="usedpc" id="flexCheckDefault">
                             <label class="form-check-label" for="flexCheckDefault">
                                 中古ノートパソコン
                             </label>
                         </div>
 
                         <div class="form-check ml-3">
-                            <input class="form-check-input" type="checkbox" value="https://kakaku.com/used/pc/ca=0010/" name="used_pc" id="flexCheckDefault">
+                            <input class="form-check-input" type="checkbox" value="https://kakaku.com/used/pc/ca=0010/" name="usedpc" id="flexCheckDefault">
                             <label class="form-check-label" for="flexCheckDefault">
                                 中古デスクトップパソコン
                             </label>
                         </div>
 
                         <div class="form-check ml-3">
-                            <input class="form-check-input" type="checkbox" value="https://kakaku.com/used/pc/ca=0019/" name="used_pc" id="flexCheckDefault">
+                            <input class="form-check-input" type="checkbox" value="https://kakaku.com/used/pc/ca=0019/" name="usedpc" id="flexCheckDefault">
                             <label class="form-check-label" for="flexCheckDefault">
                                 中古Mac デスクトップパソコン
                             </label>
                         </div>
 
                         <div class="form-check ml-3">
-                            <input class="form-check-input" type="checkbox" value="https://kakaku.com/used/pc/ca=0030/" name="used_pc" id="flexCheckDefault">
+                            <input class="form-check-input" type="checkbox" value="https://kakaku.com/used/pc/ca=0030/" name="usedpc" id="flexCheckDefault">
                             <label class="form-check-label" for="flexCheckDefault">
                                 中古タブレットPC
                             </label>
                         </div>
 
                         <div class="form-check ml-3">
-                            <input class="form-check-input" type="checkbox" value="https://kakaku.com/used/pc/ca=0080/" name="used_pc" id="flexCheckDefault">
+                            <input class="form-check-input" type="checkbox" value="https://kakaku.com/used/pc/ca=0080/" name="usedpc" id="flexCheckDefault">
                             <label class="form-check-label" for="flexCheckDefault">
                                 中古モニタ・ディスプレイ
                             </label>
@@ -78,35 +78,35 @@
                         </div>
 
                         <div class="form-check ml-3">
-                            <input class="form-check-input" type="checkbox" value="https://kakaku.com/pc/note-pc/itemlist.aspx" name="new_pc" id="flexCheckDefault">
+                            <input class="form-check-input" type="checkbox" value="https://kakaku.com/pc/note-pc/itemlist.aspx" name="newpc" id="flexCheckDefault">
                             <label class="form-check-label" for="flexCheckDefault">
                                 ノートパソコン
                             </label>
                         </div>
 
                         <div class="form-check ml-3">
-                            <input class="form-check-input" type="checkbox" value="https://kakaku.com/pc/desktop-pc/itemlist.aspx" name="new_pc" id="flexCheckDefault">
+                            <input class="form-check-input" type="checkbox" value="https://kakaku.com/pc/desktop-pc/itemlist.aspx" name="newpc" id="flexCheckDefault">
                             <label class="form-check-label" for="flexCheckDefault">
                                 デスクトップパソコン
                             </label>
                         </div>
 
                         <div class="form-check ml-3">
-                            <input class="form-check-input" type="checkbox" value="https://kakaku.com/pc/mac-note-pc/itemlist.aspx" name="new_pc" id="flexCheckDefault">
+                            <input class="form-check-input" type="checkbox" value="https://kakaku.com/pc/mac-note-pc/itemlist.aspx" name="newpc" id="flexCheckDefault">
                             <label class="form-check-label" for="flexCheckDefault">
                                 Mac ノート(MacBook)
                             </label>
                         </div>
 
                         <div class="form-check ml-3">
-                            <input class="form-check-input" type="checkbox" value="https://kakaku.com/pc/mac-desktop-pc/itemlist.aspx" name="new_pc" id="flexCheckDefault">
+                            <input class="form-check-input" type="checkbox" value="https://kakaku.com/pc/mac-desktop-pc/itemlist.aspx" name="newpc" id="flexCheckDefault">
                             <label class="form-check-label" for="flexCheckDefault">
                                 Mac デスクトップ
                             </label>
                         </div>
 
                         <div class="form-check ml-3">
-                            <input class="form-check-input" type="checkbox" value="https://kakaku.com/pc/pda/itemlist.aspx" name="new_pc" id="flexCheckDefault">
+                            <input class="form-check-input" type="checkbox" value="https://kakaku.com/pc/pda/itemlist.aspx" name="newpc" id="flexCheckDefault">
                             <label class="form-check-label" for="flexCheckDefault">
                                 タブレットPC
                             </label>
@@ -138,7 +138,7 @@
     <script>
         $('#used_pc_all').click(function(){
 
-            let target = $('input[name="used_pc"]');
+            let target = $('input[name="usedpc"]');
              //チェックボックスの現在のステータスを取得
             chk_status = target.prop("checked");
             
@@ -154,7 +154,7 @@
 
         $('#pc_all').click(function(){
 
-            let target = $('input[name="new_pc"]');
+            let target = $('input[name="newpc"]');
             //チェックボックスの現在のステータスを取得
             chk_status = target.prop("checked");
 
@@ -168,7 +168,7 @@
             }
         })
 
-        $('input[name="new_pc"]').click(function(){
+        $('input[name="newpc"]').click(function(){
 
             let target = $('#pc_all');
             //チェックボックスの現在のステータスを取得
