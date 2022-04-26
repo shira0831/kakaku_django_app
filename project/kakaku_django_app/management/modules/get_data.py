@@ -5,6 +5,7 @@ from tenacity import retry, wait_fixed
 
 from .get_data_sub import *
 import math
+import time
 
 
 retry_flg = 0
@@ -16,34 +17,45 @@ class GetData(ChromeDriver):
     def __init__(self):
         print('ChromeDriverを起動します。')
         super(GetData, self).__init__()
-        # return chrome_driver
 
     # __call__メソッドの定義
     def __call__(self):
         print('ccalll')
 
     def get_data_exception(func):
-        def wrapper(*args, **kwargs):
+        def wrapper(self,*args, **kwargs):
+
+            global retry_flg
+
             try:
-                return func(*args, **kwargs)
+                return func(self,*args, **kwargs)
+
             except InvalidSessionIdException as e:
                 print('セッション死亡！！:InvalidSessionIdException',e)
-                # chrome_driver.close_driver()
-                # retry_flg += 1
-                # print('retry_flg',retry_flg)
+                # self.close_driver()
+                retry_flg += 1
+                print('retry_flg',retry_flg)
             
             except Exception as e:
                 print('エラー:Exception',e)
-                # chrome_driver.close_driver()
-                # retry_flg += 1
-                # print('retry_flg',retry_flg)
+                # self.close_driver()
+
+                retry_flg += 1
+                print('retry_flg',retry_flg)
+                
+                
         return wrapper
 
 
     @retry
     @get_data_exception
     def get_sp(self, link):
-    
+
+        global retry_flg
+        if retry_flg > 0:
+            retry_flg = 0
+            print('リトライ')
+
         link = f'{link}spec/'
 
         print(f'{link}の情報を取得します')
@@ -66,6 +78,11 @@ class GetData(ChromeDriver):
     @retry
     @get_data_exception
     def get_newpc(self, link):
+
+        global retry_flg
+        if retry_flg > 0:
+            print('リトライ')
+            retry_flg = 0
         
         link = f'{link}spec/#tab'
         print(f'{link}の情報を取得します')
@@ -92,6 +109,12 @@ class GetData(ChromeDriver):
     @get_data_exception
     def get_usedpc(self, link):
 
+        global retry_flg
+        if retry_flg > 0:
+            retry_flg = 0
+            print('リトライ')
+        # link = f'{link}spec/#tab'
+
         print(f'{link}の情報を取得します')
         # 格納した商品urlのページを一つずつ表示する
         self.wait_displayed_page()
@@ -107,6 +130,8 @@ class GetData(ChromeDriver):
         result = item_id | item_url | spec_dict | pc_img
 
         print(result)
+        # raise InvalidSessionIdException
+
         return result
 
 
@@ -145,9 +170,8 @@ class GetData(ChromeDriver):
     def item_urls(self, url, genre, i):
 
         # pageを表示
-        print(f'{url}?pdf_pg={i}を開きます')
-        self.wait_displayed_page()
-        self.open_url(f'{url}?pdf_pg={i}')
+        
+       
 
         # page内の商品リンク先を取得
         # リンク先から戻ってくるとページが変わっているため最初にurlをリスト格納する
@@ -157,8 +181,16 @@ class GetData(ChromeDriver):
         # 変数セット
         if genre == 'usedpc':
             target_xpath = '.itemName > p > a'
+            print(f'{url}/Page={i}を開きます')
+            self.wait_displayed_page()
+            self.open_url(f'{url}Page={i}')
+
         elif genre == 'newpc':
             target_xpath = '.ckitemLink > a'
+            self.wait_displayed_page()
+            print(f'{url}?pdf_pg={i}を開きます')
+            self.open_url(f'{url}?pdf_pg={i}')
+
         elif genre == 'sp':
             target_xpath = '.p-list_name > a'
 

@@ -1,4 +1,6 @@
 from django.db import models
+from django.utils import timezone
+
 
 class UsedPC(models.Model):
 
@@ -30,6 +32,10 @@ class UsedPC(models.Model):
     モニタサイズ = models.CharField(max_length=255,blank=True,null=True,default='')
     OS = models.CharField(max_length=255,blank=True,null=True,default='')
     CPU = models.CharField(max_length=255,blank=True,null=True,default='')
+
+    # auto_now = Trueにするとadmin画面で表示されなくなる
+    # https://qiita.com/okoppe8/items/a1149b2be54441951de1
+    create_date = models.DateTimeField(default=timezone.now,null=True)
 
     def __str__(self):
         return self.item_id

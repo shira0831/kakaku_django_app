@@ -1,9 +1,8 @@
 from django.core.management.base import BaseCommand
 from sqlalchemy import create_engine
-
 from ..modules.get_data import GetData
-
 import pandas as pd
+from ...models import UsedPC
 
 
 class Command(BaseCommand):
@@ -35,12 +34,14 @@ class Command(BaseCommand):
 
             # for i in range(1, page_counts + 1):
             for i in range(1, 2):
+    
                 # ページを表示して各ページ内の商品urlを格納
                 links = get_data.item_urls(url, genre, i)
 
                 # 各商品url内の情報を取得
-                # for link in links:
                 for j in range(1,3):
+                # for link in links:
+                    print(links[j])
                     result = getattr(get_data,f'get_{genre}')(links[j])
 
                     if genre == 'sp':
@@ -53,9 +54,11 @@ class Command(BaseCommand):
             engine = create_engine('sqlite:///db.sqlite3', echo=True)
             df.to_sql(f'kakaku_django_app_{genre}',con=engine, if_exists='append', index=False)
 
+            sample = UsedPC(item_id='test1', メーカー='test1')
+            sample.save()
+
                     
         # driverを削除する
         get_data.close_driver()
         print('スクレイピング処理完了')
-
         
