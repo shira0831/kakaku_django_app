@@ -9,7 +9,7 @@ from django.contrib import messages
 from sqlalchemy import create_engine
 import pandas as pd
 
-
+from datetime import datetime as dt
 
 
 import csv
@@ -65,11 +65,35 @@ class IndexView(View):
 def csvexport(request):
     print('csvexportcsvexportcsvexportcsvexportcsvexport')
 
-    engine = create_engine('sqlite:///db.sqlite3', echo=True)
-    df = pd.read_sql_table('kakaku_django_app_usedpc', engine)
-    
-    response = HttpResponse(content_type='text/csv; charset=utf8')
-    response['Content-Disposition'] = 'attachment; filename=users.csv'
-    df.to_csv(path_or_buf=response, encoding='utf_8_sig', index=False)
+    data  = request.GET.get('from')
+    data2 = request.GET.get('to')
+    data3 = request.GET.get('csv_usedpc')
+    data4 = request.GET.get('csv_newpc')
+    data5 = request.GET.get('csv_sp')
 
-    return response
+    print('data',data,data2,data3,data4,data5)
+
+    # engine = create_engine('sqlite:///db.sqlite3', echo=True)
+    # df = pd.read_sql_table('kakaku_django_app_usedpc', engine)
+
+    # df['X'] = pd.to_datetime(df['create_date'])
+    # print('df2',df['X'])
+    # df['Z'] = df['X'].dt.strftime('%Y-%m-%d')
+    # print('df3',df['Z'])
+ 
+    # df4 = df[df['Z'] == data]
+    # print('df4',df4)
+
+    # # # df = df[df['create_date'] == "2021-04-27"]
+    # # # print(df)
+    # df4.to_csv("pandas_test.csv", index=False, encoding="utf-8-sig")
+
+    
+    # response = HttpResponse(content_type='text/csv; charset=utf8')
+    # response['Content-Disposition'] = 'attachment; filename=users.csv'
+    # df.to_csv(path_or_buf=response, encoding='utf_8_sig', index=False)
+
+    # return response
+    # return render(request, 'index', params)
+    messages.info(request, 'CSV抽出を開始します')
+    return redirect('index')

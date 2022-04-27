@@ -1,8 +1,7 @@
 from django.core.management.base import BaseCommand
-from sqlalchemy import create_engine
 from ..modules.get_data import GetData
-import pandas as pd
-from ...models import UsedPC
+from ...models import *
+import time
 
 
 class Command(BaseCommand):
@@ -16,7 +15,7 @@ class Command(BaseCommand):
     def handle(self, *args,**kwargs):
         self.stdout.write(self.style.SUCCESS('id = "%s"' % kwargs['id']))
 
-        # GetDataクラスからdriverを生成
+        # GetDataクラスからsuper()でdriverを生成
         get_data = GetData()
         
         data= []
@@ -34,15 +33,13 @@ class Command(BaseCommand):
 
             # for i in range(1, page_counts + 1):
             for i in range(1, 2):
-    
                 # ページを表示して各ページ内の商品urlを格納
                 links = get_data.item_urls(url, genre, i)
-
                 # 各商品url内の情報を取得
-                for j in range(1,3):
-                # for link in links:
-                    print(links[j])
-                    result = getattr(get_data,f'get_{genre}')(links[j])
+                # for j in range(1,10):
+                for link in links:
+                    time.sleep(2)
+                    result = getattr(get_data,f'get_{genre}')(link)
 
                     if genre == 'sp':
                         data.extend(result)
@@ -50,12 +47,26 @@ class Command(BaseCommand):
                         data.append(result)
 
             # DBへデータ登録
-            df = pd.DataFrame(data)
-            engine = create_engine('sqlite:///db.sqlite3', echo=True)
-            df.to_sql(f'kakaku_django_app_{genre}',con=engine, if_exists='append', index=False)
+            # 本当はsqlalchemyで登録したかったけどdjango ORMのmodel定義だとDBのcreate_dateが
+            # デフォルト値設定できなかったのでobjects.createで登録。
+            # テーブル定義をdjango ORMではなくsqlalchemyですればsqlalchemyでもデフォルト値設定できるっぽい？
+            # 
+            # sqlalchemyでの登録方法↓
+            # df = pd.DataFrame(data)
+            # engine = create_engine('sqlite:///db.sqlite3', echo=True)
+            # df.to_sql(f'kakaku_django_app_{genre}',con=engine, if_exists='append', index=False)
+            # 
+            # 参考↓
+            # https://stackoverflow.com/questions/2696797/how-to-save-django-object-using-dictionary
 
-            sample = UsedPC(item_id='test1', メーカー='test1')
-            sample.save()
+            for d in data:
+                if genre == 'usedpc':
+                        UsedPC.objects.create(**d)
+                elif genre == 'newpc':
+                        NewPC.objects.create(**d)
+                elif genre == 'sp':
+                        Sp.objects.create(**d)
+            print('DB登録!')
 
                     
         # driverを削除する

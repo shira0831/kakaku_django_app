@@ -1,5 +1,4 @@
 from .chrome_driver import ChromeDriver
-from selenium.common.exceptions import WebDriverException
 from selenium.common.exceptions import InvalidSessionIdException
 from tenacity import retry, wait_fixed
 
@@ -20,7 +19,10 @@ class GetData(ChromeDriver):
 
     # __call__メソッドの定義
     def __call__(self):
-        print('ccalll')
+        print('callメソッド!!!')
+
+    def __del__(self):
+        print('class GetDataの終了（デストラクタの呼び出し）')
 
     def get_data_exception(func):
         def wrapper(self,*args, **kwargs):
@@ -32,18 +34,16 @@ class GetData(ChromeDriver):
 
             except InvalidSessionIdException as e:
                 print('セッション死亡！！:InvalidSessionIdException',e)
-                # self.close_driver()
+                time.sleep(5)
                 retry_flg += 1
                 print('retry_flg',retry_flg)
             
             except Exception as e:
                 print('エラー:Exception',e)
-                # self.close_driver()
-
+                time.sleep(5)
                 retry_flg += 1
                 print('retry_flg',retry_flg)
-                
-                
+
         return wrapper
 
 
@@ -53,8 +53,11 @@ class GetData(ChromeDriver):
 
         global retry_flg
         if retry_flg > 0:
-            retry_flg = 0
             print('リトライ')
+            time.sleep(5)
+            self = GetData()
+            time.sleep(10)
+            retry_flg = 0
 
         link = f'{link}spec/'
 
@@ -82,6 +85,9 @@ class GetData(ChromeDriver):
         global retry_flg
         if retry_flg > 0:
             print('リトライ')
+            time.sleep(5)
+            self = GetData()
+            time.sleep(10)
             retry_flg = 0
         
         link = f'{link}spec/#tab'
@@ -105,15 +111,18 @@ class GetData(ChromeDriver):
         print(result)
         return result
 
-    @retry
+    @retry 
     @get_data_exception
     def get_usedpc(self, link):
 
         global retry_flg
         if retry_flg > 0:
-            retry_flg = 0
             print('リトライ')
-        # link = f'{link}spec/#tab'
+            time.sleep(5)
+            self = GetData()
+            time.sleep(10)
+            retry_flg = 0
+            
 
         print(f'{link}の情報を取得します')
         # 格納した商品urlのページを一つずつ表示する
@@ -130,7 +139,6 @@ class GetData(ChromeDriver):
         result = item_id | item_url | spec_dict | pc_img
 
         print(result)
-        # raise InvalidSessionIdException
 
         return result
 
@@ -168,10 +176,6 @@ class GetData(ChromeDriver):
 
 
     def item_urls(self, url, genre, i):
-
-        # pageを表示
-        
-       
 
         # page内の商品リンク先を取得
         # リンク先から戻ってくるとページが変わっているため最初にurlをリスト格納する

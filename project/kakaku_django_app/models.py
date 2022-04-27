@@ -47,7 +47,9 @@ class NewPC(models.Model):
     class Meta:
         verbose_name = '新品PC'
         verbose_name_plural = '新品PC'
-
+    # auto_now = Trueにするとadmin画面で表示されなくなる
+    # https://qiita.com/okoppe8/items/a1149b2be54441951de1
+    create_date = models.DateTimeField(default=timezone.now,null=True)
     #商品番号
     title = models.CharField(max_length=255,blank=True,null=True,default='')
     発売日  = models.CharField(max_length=255,blank=True,null=True,default='')
@@ -122,6 +124,10 @@ class Sp(models.Model):
     class Meta:
         verbose_name = 'sp'
         verbose_name_plural = 'sp'
+
+    # auto_now = Trueにするとadmin画面で表示されなくなる
+    # https://qiita.com/okoppe8/items/a1149b2be54441951de1
+    create_date = models.DateTimeField(default=timezone.now,null=True)
 
     #商品番号
     maker = models.CharField(max_length=255,blank=True,null=True,default='')
